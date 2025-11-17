@@ -1,0 +1,46 @@
+{
+    "version": 1,
+    "name": "PaddleControls",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "3239cedd-0e97-4bef-9cfc-e66a699fcd55",
+            "actions": [
+                {
+                    "name": "MovePaddle",
+                    "type": "Value",
+                    "id": "5ec109f1-482c-4731-bd9c-eeb843a7c59e",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "0a653941-9116-4447-82dd-4f8c77afff95",
+                    "path": "<Touchscreen>/primaryTouch/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MovePaddle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c37d8065-162c-41a7-8bfc-f766fa29419a",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MovePaddle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
