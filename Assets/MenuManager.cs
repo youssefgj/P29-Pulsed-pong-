@@ -10,6 +10,10 @@ public class MenuManager : MonoBehaviour
 
     public void OpenSettings()
     {
-        SceneManager.LoadScene("SettingsScene"); // name of your settings scene
+        SceneManager.LoadScene("Settings"); // name of your settings scene
+    }
+    public void OpenMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu"); // main menu scene
     }
 }
