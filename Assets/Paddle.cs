@@ -1,48 +1,59 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // <-- IMPORTANT: Add the using statement
+using UnityEngine.InputSystem;
 
 public class Paddle : MonoBehaviour
 {
     private Vector2 startPosition;
-    private float targetX; // Variable to hold the current input position
+    private float targetX;
+
+    // We need to know how wide the paddle is to stop it correctly
+    private float halfWidth;
+
+    // Define your wall positions here (or calculated from screen)
+    [SerializeField] private float leftWallX = -8.0f;
+    [SerializeField] private float rightWallX = 8.0f;
 
     void Start()
     {
         startPosition = transform.position;
         targetX = startPosition.x;
+
+        // AUTOMATICALLY CALCULATE PADDLE WIDTH
+        // This gets the distance from the center to the edge.
+        // It works even if you resize the paddle later!
+        if (GetComponent<SpriteRenderer>() != null)
+        {
+            halfWidth = GetComponent<SpriteRenderer>().bounds.extents.x;
+        }
+        else
+        {
+            // Fallback if no SpriteRenderer (e.g., standard Cube)
+            halfWidth = transform.localScale.x / 2f;
+        }
     }
 
-    // New method to handle the input action event
     public void OnMovePaddle(InputAction.CallbackContext context)
     {
-        // Read the 2D value (touch or mouse position)
         if (context.performed)
         {
-            // Get the screen position from the input action
             Vector2 screenPosition = context.ReadValue<Vector2>();
-
-            // Convert screen position to world position and store the X component
             Vector2 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
             targetX = worldPosition.x;
-        }
-        // Handle when input ends (optional, but good practice)
-        else if (context.canceled)
-        {
-            // You might want to stop movement here if you weren't constantly tracking
         }
     }
 
     void Update()
     {
-        // 1. Clamp the calculated X position to stay within the desired horizontal bounds
-        float newX = Mathf.Clamp(targetX, -8.0f, 8.0f); // Adjust bounds as needed
+        // THE FIX IS HERE:
+        // We clamp between (LeftWall + Width) and (RightWall - Width)
+        float clampedX = Mathf.Clamp(targetX, leftWallX + halfWidth, rightWallX - halfWidth);
 
-        // 2. Apply the new position, keeping Y fixed
-        transform.position = new Vector2(newX, transform.position.y);
+        transform.position = new Vector2(clampedX, transform.position.y);
     }
 
     public void Reset()
     {
         transform.position = startPosition;
+        targetX = startPosition.x; // Don't forget to reset the target too!
     }
 }

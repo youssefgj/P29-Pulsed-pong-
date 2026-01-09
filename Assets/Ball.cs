@@ -1,57 +1,68 @@
-using System.Collections; // Needed for IEnumerator
+using System.Collections;
 using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
+    [Header("Base Settings")]
     [SerializeField] private float speed = 5f;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private float spawnHeightRange = 3f; // New: How much up/down it can spawn
+    [SerializeField] private float spawnHeightRange = 3f;
 
-    // We don't need startPosition anymore if we are randomizing it
+    [Header("Hit Feel Settings")] // New section for the "Juice"
+    [SerializeField] private float speedMultiplier = 1.1f; // 1.1 = 10% faster per hit
+    [SerializeField] private float maxSpeed = 15f;         // Cap to prevent glitches
 
     void Start()
     {
-        Reset(); // Call Reset immediately to start the loop
+        Reset();
     }
 
     public void Reset()
     {
-        // 1. Stop the ball
         rb.linearVelocity = Vector2.zero;
 
-        // 2. Randomize Y Position (Fixes "Same Position" problem)
-        // Keep X at 0, but pick a random Y
+        // Reset speed to base level in case it got fast in the last round
+        // (Optional, but good practice if you modify 'speed' variable directly)
+
         float randomY = Random.Range(-spawnHeightRange, spawnHeightRange);
         transform.position = new Vector2(0, randomY);
 
-        // 3. Wait before launching (Better gameplay flow)
         StartCoroutine(LaunchAfterDelay());
     }
 
     private IEnumerator LaunchAfterDelay()
     {
-        yield return new WaitForSeconds(1f); // Waits 1 second
+        yield return new WaitForSeconds(1f);
         Launch();
     }
 
     public void Launch()
     {
-        // Fix 1: Randomize X Direction correctly
-        // Random.Range(0, 2) gives either 0 or 1.
         float xDir = Random.Range(0, 2) == 0 ? -1 : 1;
-
-        // Fix 2: Randomize Y Direction (Angle)
-        // This ensures the ball doesn't always move at 45 degrees.
-        // We pick a value between 0.2 and 1.0 to avoid boring straight lines.
         float yDir = Random.Range(0.2f, 1.0f);
-
-        // Randomly flip Y to be up or down
         if (Random.Range(0, 2) == 0) yDir = -yDir;
 
         Vector2 direction = new Vector2(xDir, yDir);
-
-        // Fix 3: Normalize!
-        // This ensures the speed is exactly "speed", no matter the angle.
         rb.linearVelocity = direction.normalized * speed;
+    }
+
+    // --- NEW CODE BELOW ---
+
+    // This function runs automatically whenever the ball hits a collider
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // Check if we hit the Paddle (Make sure your paddles have the tag "Player")
+        // Or if you want it to speed up on walls too, remove the 'if' check.
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            // 1. Multiply the current velocity
+            Vector2 newVelocity = rb.linearVelocity * speedMultiplier;
+
+            // 2. Cap the speed so it doesn't break the game
+            rb.linearVelocity = Vector2.ClampMagnitude(newVelocity, maxSpeed);
+
+            // Optional: Debug log to see the speed increase in Console
+            // Debug.Log("Hit! New Speed: " + rb.linearVelocity.magnitude);
+        }
     }
 }
