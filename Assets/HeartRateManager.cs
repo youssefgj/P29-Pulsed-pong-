@@ -3,43 +3,53 @@ using UnityEngine;
 public class HeartRateManager : MonoBehaviour
 {
     [Header("Dependencies")]
-    public AudioSource backgroundMusic; // Drag your music source here
+    public AudioSource backgroundMusic;
 
-    [Header("Heart Rate Simulation")]
+    [Header("Mode")]
+    [Tooltip("If true, the slider below controls BPM. If false, the Camera controls it.")]
+    public bool useSimulatedHeartRate = false;
+
+    [Header("Heart Rate Data")]
     [Range(40, 160)]
-    public float currentHeartRate = 80f; // Slider to test manually!
+    public float currentHeartRate = 60f; // Adjusted by Camera or Slider
 
-    [Header("Difficulty Settings")]
-    public float minBPM = 60f;    // Relaxed (Fast Game)
-    public float maxBPM = 120f;   // Stressed (Slow Game)
+    [Header("Your Physiology (The Bornes)")]
+    public float minBPM = 50f;    // Resting (Game is Fast)
+    public float maxBPM = 90f;    // Stressed (Game is Slow)
 
     [Header("Game Speed Limits")]
-    public float fastestGameSpeed = 1.5f;
-    public float slowestGameSpeed = 0.5f;
+    public float fastestGameSpeed = 1.5f; // When you are Chill (50 BPM)
+    public float slowestGameSpeed = 0.5f; // When you are Stressed (90 BPM)
 
     void Update()
     {
-        // SAFETY CHECK: If the game is paused via UI, do not override it.
-        if (Time.timeScale == 0) return;
+        if (Time.timeScale == 0) return; // Don't run if paused
 
-        // 1. Convert Heart Rate to a 0.0 - 1.0 scale
-        // 0.0 means at or below minBPM
-        // 1.0 means at or above maxBPM
+        // 1. Convert Heart Rate to a 0.0 (Chill) - 1.0 (Stressed) scale
+        // This math handles your custom 50-90 range automatically!
         float stressFactor = Mathf.InverseLerp(minBPM, maxBPM, currentHeartRate);
 
         // 2. Calculate Target Speed
-        // If stress is 0 (Relaxed), target is fastestGameSpeed
-        // If stress is 1 (Stressed), target is slowestGameSpeed
+        // Logic: Low Stress = Fast Speed, High Stress = Slow Speed
         float targetSpeed = Mathf.Lerp(fastestGameSpeed, slowestGameSpeed, stressFactor);
 
-        // 3. Apply Smoothly (Linear Interpolation)
-        // We use Time.unscaledDeltaTime because Time.deltaTime gets affected by the timeScale itself!
-        Time.timeScale = Mathf.Lerp(Time.timeScale, targetSpeed, Time.unscaledDeltaTime * 2f);
+        // 3. Apply Smoothly
+        // We use 'Unscaled' time so the transition happens smoothly even if game is slow
+        Time.timeScale = Mathf.Lerp(Time.timeScale, targetSpeed, Time.unscaledDeltaTime * 1.0f);
 
-        // 4. Adjust Music Pitch to match Game Speed
+        // 4. Adjust Music Pitch
         if (backgroundMusic != null)
         {
             backgroundMusic.pitch = Time.timeScale;
+        }
+    }
+
+    // This function allows the FingerPulseDetector to send data here safely
+    public void SetHeartRate(float detectedBPM)
+    {
+        if (!useSimulatedHeartRate)
+        {
+            currentHeartRate = detectedBPM;
         }
     }
 }
