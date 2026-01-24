@@ -18,6 +18,8 @@ public class BackgroundMusicController : MonoBehaviour
     private PersonState lastState;
     private float originalVolume;
 
+    private bool isPaused = false;
+
     void Awake()
     {
         if (audioSource == null)
@@ -42,7 +44,7 @@ public class BackgroundMusicController : MonoBehaviour
 
     void Update()
     {
-        if (stateController == null || audioSource == null)
+        if (stateController == null || audioSource == null || isPaused)
             return;
 
         PersonState currentState = stateController.CurrentState;
@@ -112,5 +114,20 @@ public class BackgroundMusicController : MonoBehaviour
             default:
                 return normalClip;
         }
+    }
+    public void PauseMusic()
+    {
+        isPaused = true;
+        StopAllCoroutines();   // ⛔ stop fades immediately
+        if (audioSource != null)
+            audioSource.Pause();
+
+    }
+    public void ResumeMusic()
+    {
+        isPaused = false;
+
+        if (audioSource != null)
+            audioSource.UnPause();
     }
 }

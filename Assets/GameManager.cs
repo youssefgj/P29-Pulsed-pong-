@@ -12,9 +12,12 @@ public class GameManager : MonoBehaviour
 
     // Reference to the AudioSource component
     [SerializeField] private AudioSource goalSound;
+    [SerializeField] private BackgroundMusicController musicManager;
 
     private int playerScore = 0;
     private int aiScore = 0;
+
+    private bool isPaused = false;
 
     public void PlayerGetScore(bool isPlayer)
     {
@@ -41,5 +44,26 @@ public class GameManager : MonoBehaviour
         ball.Reset();
         playerPaddle.Reset();
         aiPaddle.Reset();
+    }
+
+    public void TogglePause()
+    {
+        if (isPaused)
+            ResumeGame();
+        else
+            PauseGame();
+    }
+
+    private void PauseGame()
+    {
+        isPaused = true;
+        Time.timeScale = 0f; // Pause game time
+        AudioListener.pause = true;
+    }
+    private void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1f; // Resume game time
+        AudioListener.pause = false;  // Resume audio
     }
 }

@@ -5,12 +5,12 @@ public class MenuManager : MonoBehaviour
 {
     public void PlayGame()
     {
-        SceneManager.LoadScene("SampleScene");   // name of your game scene
+        SceneManager.LoadScene("SampleScene");   // game scene
     }
 
     public void OpenSettings()
     {
-        SceneManager.LoadScene("Settings"); // name of your settings scene
+        SceneManager.LoadScene("Settings"); // settings scene
     }
     public void OpenMainMenu()
     {
