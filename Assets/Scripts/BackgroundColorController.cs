@@ -5,7 +5,7 @@ public class BackgroundColorController : MonoBehaviour
 {
     [Header("Background Colors")]
     public Color relaxedColor = new Color(1f, 0.78f, 0.65f);   // Warm Relax
-    public Color normalColor  = new Color(0.80f, 0.93f, 0.84f); // Soft Neutral
+    public Color normalColor  = new Color(0.365f, 0.804f, 0.949f); // Soft Neutral
     public Color tenseColor   = new Color(0.65f, 0.85f, 1f);    // Soft Cool Tense
 
     [Header("References")]
@@ -40,6 +40,8 @@ public class BackgroundColorController : MonoBehaviour
             targetColor,
             Time.deltaTime * changeSpeed
         );
+        // Debug.Log(stateController.CurrentState + "  HR=" + FindObjectOfType<HeartRateManager>().currentHeartRate);
+
     }
 
     // Reads state from stateController and sets color + text

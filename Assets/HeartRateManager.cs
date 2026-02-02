@@ -3,6 +3,8 @@ using UnityEngine;
 public class HeartRateManager : MonoBehaviour
 {
     [Header("Dependencies")]
+    public PersonStateController stateController;
+
     public AudioSource backgroundMusic;
 
     [Header("Mode")]
@@ -29,6 +31,7 @@ public class HeartRateManager : MonoBehaviour
         // This math handles your custom 50-90 range automatically!
         float stressFactor = Mathf.InverseLerp(minBPM, maxBPM, currentHeartRate);
 
+
         // 2. Calculate Target Speed
         // Logic: Low Stress = Fast Speed, High Stress = Slow Speed
         float targetSpeed = Mathf.Lerp(fastestGameSpeed, slowestGameSpeed, stressFactor);
@@ -41,6 +44,11 @@ public class HeartRateManager : MonoBehaviour
         if (backgroundMusic != null)
         {
             backgroundMusic.pitch = Time.timeScale;
+        }
+        // 5. Adjust Background
+        if (stateController != null)
+        {
+            stateController.UpdateStateFromHeartRate(currentHeartRate);
         }
     }
 
