@@ -15,7 +15,7 @@ public class PersonStateController : MonoBehaviour
     // Decide the state only from heart rate value
     public void UpdateStateFromHeartRate(float heartRate)
     {
-        if (heartRate < 50f)
+        if (heartRate < 60f)
             CurrentState = PersonState.Relax;
         else if (heartRate <= 100f)
             CurrentState = PersonState.Normal;
