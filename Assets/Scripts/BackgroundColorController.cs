@@ -10,7 +10,7 @@ public class BackgroundColorController : MonoBehaviour
 
     [Header("References")]
     public PersonStateController stateController;  // Source of the current state
-    public TextMeshProUGUI stateLabel;            // Text in the middle
+    // public TextMeshProUGUI stateLabel;            // Text in the middle
 
     [Header("Settings")]
     public float changeSpeed = 2f;                // Lerp speed
@@ -54,17 +54,17 @@ public class BackgroundColorController : MonoBehaviour
         {
             case PersonState.Relax:
                 targetColor = relaxedColor;
-                if (stateLabel != null) stateLabel.text = "Relax";
+                // if (stateLabel != null) stateLabel.text = "Relax";
                 break;
 
             case PersonState.Normal:
                 targetColor = normalColor;
-                if (stateLabel != null) stateLabel.text = "Normal";
+                // if (stateLabel != null) stateLabel.text = "Normal";
                 break;
 
             case PersonState.Tense:
                 targetColor = tenseColor;
-                if (stateLabel != null) stateLabel.text = "Tense";
+                // if (stateLabel != null) stateLabel.text = "Tense";
                 break;
         }
     }
