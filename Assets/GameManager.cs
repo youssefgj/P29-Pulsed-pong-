@@ -10,8 +10,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerScoreText;
     [SerializeField] private TextMeshProUGUI aiScoreText;
 
-    [SerializeField] private GameObject pausePanel;
-
     // Reference to the AudioSource component
     [SerializeField] private AudioSource goalSound;
     [SerializeField] private BackgroundMusicController musicManager;
@@ -56,18 +54,16 @@ public class GameManager : MonoBehaviour
             PauseGame();
     }
 
-    public void PauseGame()
+    private void PauseGame()
     {
         isPaused = true;
         Time.timeScale = 0f; // Pause game time
         AudioListener.pause = true;
-        pausePanel.SetActive(true);
     }
-    public void ResumeGame()
+    private void ResumeGame()
     {
         isPaused = false;
         Time.timeScale = 1f; // Resume game time
         AudioListener.pause = false;  // Resume audio
-        pausePanel.SetActive(false);
     }
 }
