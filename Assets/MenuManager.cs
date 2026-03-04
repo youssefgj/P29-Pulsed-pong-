@@ -18,4 +18,8 @@ public class MenuManager : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenu"); // main menu scene
     }
+    public void OpenStats()
+    {
+        SceneManager.LoadScene("StatsScene");
+    }
 }

@@ -11,7 +11,7 @@ public class Ball : MonoBehaviour
     [Header("Hit Feel Settings")] // New section for the "Juice"
     [SerializeField] private float speedMultiplier = 1.1f; // 1.1 = 10% faster per hit
     [SerializeField] private float maxSpeed = 15f;         // Cap to prevent glitches
-
+    [SerializeField] private float minYVelocity = 1.5f;
     void Start()
     {
         Reset();
@@ -51,18 +51,23 @@ public class Ball : MonoBehaviour
     // This function runs automatically whenever the ball hits a collider
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if we hit the Paddle (Make sure your paddles have the tag "Player")
-        // Or if you want it to speed up on walls too, remove the 'if' check.
+        Vector2 velocity = rb.linearVelocity;
+
+        // Prevent almost-horizontal movement
+        if (Mathf.Abs(velocity.y) < minYVelocity)
+        {
+            velocity.y = minYVelocity * Mathf.Sign(Random.Range(-1f, 1f));
+        }
+
+        // Apply paddle speed increase
         if (collision.gameObject.CompareTag("Player"))
         {
-            // 1. Multiply the current velocity
-            Vector2 newVelocity = rb.linearVelocity * speedMultiplier;
-
-            // 2. Cap the speed so it doesn't break the game
-            rb.linearVelocity = Vector2.ClampMagnitude(newVelocity, maxSpeed);
-
-            // Optional: Debug log to see the speed increase in Console
-            // Debug.Log("Hit! New Speed: " + rb.linearVelocity.magnitude);
+            velocity *= speedMultiplier;
         }
+
+        // Clamp max speed
+        velocity = Vector2.ClampMagnitude(velocity, maxSpeed);
+
+        rb.linearVelocity = velocity;
     }
 }
