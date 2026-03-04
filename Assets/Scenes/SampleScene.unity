@@ -1030,6 +1030,7 @@ MonoBehaviour:
   spawnHeightRange: 3
   speedMultiplier: 1.1
   maxSpeed: 15
+  minYVelocity: 1.5
 --- !u!58 &481953880
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1298,6 +1299,7 @@ GameObject:
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420034}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1430,7 +1432,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d78a7e9dc4a1388478880a79b0ebf4fb, type: 3}
   m_Name: 
@@ -1439,6 +1441,24 @@ MonoBehaviour:
   normalColor: {r: 0, g: 0.101960786, b: 0.28235295, a: 1}
   tenseColor: {r: 0.35686275, g: 0.8039216, b: 0.94509804, a: 1}
   stateController: {fileID: 368195173}
+  changeSpeed: 2
+--- !u!114 &519420034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5441d73fbec43ef4d9c3572f839d95f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BackgroundColorController2
+  heartRateManager: {fileID: 1360482464}
+  minHR: 40
+  maxHR: 120
+  lowColor: {r: 1, g: 1, b: 1, a: 1}
+  highColor: {r: 0, g: 0.101960786, b: 0.28235295, a: 1}
   changeSpeed: 2
 --- !u!1 &559867682
 GameObject:
