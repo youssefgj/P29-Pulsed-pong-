@@ -1,5 +1,7 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,6 +22,8 @@ public class GameManager : MonoBehaviour
     private int aiScore = 0;
 
     private bool isPaused = false;
+
+    private bool isMuted = false;
 
     public void PlayerGetScore(bool isPlayer)
     {
@@ -61,13 +65,35 @@ public class GameManager : MonoBehaviour
         isPaused = true;
         Time.timeScale = 0f; // Pause game time
         AudioListener.pause = true;
+        ToggleSoundOn();    
         pausePanel.SetActive(true);
     }
     public void ResumeGame()
     {
         isPaused = false;
         Time.timeScale = 1f; // Resume game time
-        AudioListener.pause = false;  // Resume audio
+        if (isMuted ==false)
+        {
+            AudioListener.pause = false;  // Resume audio
+        }
         pausePanel.SetActive(false);
+    }
+
+    public void SoundOn()
+    {
+        AudioListener.pause = false;
+        isMuted = false;
+    }
+    public void SoundOff()
+    {
+        AudioListener.pause = true;
+        isMuted = true;
+    }
+    public void ToggleSoundOn()
+    {
+        if (isPaused == true)
+            SoundOff();
+        else
+            SoundOn();
     }
 }
