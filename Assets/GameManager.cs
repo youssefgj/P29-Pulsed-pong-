@@ -64,8 +64,7 @@ public class GameManager : MonoBehaviour
     {
         isPaused = true;
         Time.timeScale = 0f; // Pause game time
-        AudioListener.pause = true;
-        ToggleSoundOn();    
+        AudioListener.pause = true;  
         pausePanel.SetActive(true);
     }
     public void ResumeGame()
@@ -81,19 +80,16 @@ public class GameManager : MonoBehaviour
 
     public void SoundOn()
     {
-        AudioListener.pause = false;
         isMuted = false;
+
+    if (!isPaused)
+    {
+        AudioListener.pause = false;
+    }
     }
     public void SoundOff()
     {
         AudioListener.pause = true;
         isMuted = true;
-    }
-    public void ToggleSoundOn()
-    {
-        if (isPaused == true)
-            SoundOff();
-        else
-            SoundOn();
     }
 }
