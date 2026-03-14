@@ -83,9 +83,9 @@ public class GraphVisualizer : MonoBehaviour
         float xMax = session.heartRateLogs[session.heartRateLogs.Count - 1].timeStamp;
         if (xMax <= 0.1f) xMax = 1f;
 
-        float graphHeight = graphContainer.sizeDelta.y;
-        float graphWidth = graphContainer.sizeDelta.x;
-
+        float graphHeight = graphContainer.rect.height;
+        float graphWidth = graphContainer.rect.width;
+        
         // 3. Draw Grid & Y-Axis Labels (FIXED ALIGNMENT)
         int separatorCount = 5;
         for (int i = 0; i <= separatorCount; i++)
