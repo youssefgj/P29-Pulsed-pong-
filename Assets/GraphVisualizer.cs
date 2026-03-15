@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.IO; // IMPORTANT: Needed for File reading
+using System.IO;
 using System.Collections.Generic;
 
 public class GraphVisualizer : MonoBehaviour
@@ -11,8 +11,8 @@ public class GraphVisualizer : MonoBehaviour
 
     [Header("Visuals")]
     [SerializeField] private Sprite circleSprite;
-    [SerializeField] private Color dotColor = new Color(1, 1, 1, 1);
-    [SerializeField] private Color lineColor = new Color(0, 1, 0, 0.5f);
+    [SerializeField] private Color dotColor = new Color(1,1,1,1);
+    [SerializeField] private Color lineColor = new Color(0,1,0,0.5f);
     [SerializeField] private float lineThickness = 3f;
 
     [Header("Labels & Grid")]
@@ -20,207 +20,285 @@ public class GraphVisualizer : MonoBehaviour
     [SerializeField] private GameObject labelTemplateY;
     [SerializeField] private GameObject dashTemplate;
 
-    // --- THIS WAS MISSING: The Trigger ---
-    private void Start()
+    [Header("Session Menu")]
+    [SerializeField] private GameObject sessionsPanel;
+
+    private List<SessionData> lastSessions = new List<SessionData>();
+
+    [SerializeField] private TextMeshProUGUI sessionDateText;
+
+    void Start()
     {
-        LoadLastSession();
+        LoadLastSessions();
+
+        if(lastSessions.Count > 0)
+            ShowSession(0);
     }
 
-    // --- THIS WAS MISSING: The Loader ---
-    public void LoadLastSession()
+
+    // -------------------------------
+    // SESSION MENU
+    // -------------------------------
+
+    public void ToggleSessionsMenu()
+    {
+        if(sessionsPanel != null)
+            sessionsPanel.SetActive(!sessionsPanel.activeSelf);
+    }
+
+    public void ShowSession(int index)
+    {
+        if(index < 0 || index >= lastSessions.Count)
+        {
+            Debug.LogWarning("Invalid session index.");
+            return;
+        }
+
+        SessionData session = lastSessions[index];
+
+        ShowGraph(session);
+
+        if(sessionDateText != null)
+        {
+            sessionDateText.text = session.playDate;
+        }
+
+        if(sessionsPanel != null)
+            sessionsPanel.SetActive(false);
+    }
+
+
+    // -------------------------------
+    // LOAD LAST 3 SESSIONS
+    // -------------------------------
+
+    public void LoadLastSessions()
     {
         string path = Path.Combine(Application.persistentDataPath, "pulspong_sessions.json");
 
-        Debug.Log("Attempting to load data from: " + path);
-
-        if (!File.Exists(path))
+        if(!File.Exists(path))
         {
-            Debug.LogError("File not found! Play the game first to generate data.");
+            Debug.LogError("Session file not found.");
             return;
         }
 
         string json = File.ReadAllText(path);
 
-        // Safety check if file is empty
-        if (string.IsNullOrEmpty(json))
+        if(string.IsNullOrEmpty(json))
         {
-            Debug.LogError("File is empty.");
+            Debug.LogError("Session file empty.");
             return;
         }
 
         SessionDatabase db = JsonUtility.FromJson<SessionDatabase>(json);
 
-        if (db != null && db.allSessions.Count > 0)
+        if(db == null || db.allSessions.Count == 0)
         {
-            // Get the most recent session
-            SessionData lastSession = db.allSessions[db.allSessions.Count - 1];
-            ShowGraph(lastSession);
+            Debug.LogWarning("No sessions found.");
+            return;
         }
-        else
+
+        lastSessions.Clear();
+
+        int startIndex = Mathf.Max(0, db.allSessions.Count - 3);
+
+        for(int i = db.allSessions.Count - 1; i >= startIndex; i--)
         {
-            Debug.LogWarning("Database loaded but no sessions found inside.");
+            lastSessions.Add(db.allSessions[i]);
         }
     }
 
-    // --- The Drawing Logic ---
+
+    // -------------------------------
+    // DRAW GRAPH
+    // -------------------------------
+
     public void ShowGraph(SessionData session)
     {
-        // 1. Clean up previous graph
-        foreach (Transform child in graphContainer)
+        // CLEAR EVERYTHING
+        foreach(Transform child in graphContainer)
         {
             Destroy(child.gameObject);
         }
 
-        if (session == null || session.heartRateLogs.Count < 2)
+        if(session == null || session.heartRateLogs.Count < 2)
         {
-            Debug.LogWarning("GraphVisualizer: Not enough data.");
+            Debug.LogWarning("Not enough data.");
             return;
         }
 
-        // 2. Define Axis Limits
         float yMax = 160f;
         float yMin = 40f;
+
         float xMax = session.heartRateLogs[session.heartRateLogs.Count - 1].timeStamp;
-        if (xMax <= 0.1f) xMax = 1f;
+
+        if(xMax <= 0.1f)
+            xMax = 1f;
 
         float graphHeight = graphContainer.rect.height;
         float graphWidth = graphContainer.rect.width;
-        
-        // 3. Draw Grid & Y-Axis Labels (FIXED ALIGNMENT)
+
+
+        // -------------------------------
+        // Y AXIS
+        // -------------------------------
+
         int separatorCount = 5;
-        for (int i = 0; i <= separatorCount; i++)
+
+        for(int i = 0; i <= separatorCount; i++)
         {
             float normalizedValue = (float)i / separatorCount;
             float yPos = normalizedValue * graphHeight;
 
-            if (labelTemplateY != null)
+            if(labelTemplateY != null)
             {
                 GameObject labelY = Instantiate(labelTemplateY, graphContainer);
                 labelY.SetActive(true);
 
-                // Set Value
-                float bpmValue = yMin + (normalizedValue * (yMax - yMin));
-                TextMeshProUGUI tmp = labelY.GetComponent<TextMeshProUGUI>();
-                tmp.text = Mathf.RoundToInt(bpmValue).ToString();
+                float bpmValue = yMin + normalizedValue * (yMax - yMin);
 
-                // FORCE ALIGNMENT: Align Text to the Right
+                TextMeshProUGUI tmp = labelY.GetComponent<TextMeshProUGUI>();
+                tmp.fontSize = 28;
+                tmp.text = Mathf.RoundToInt(bpmValue).ToString();
                 tmp.alignment = TextAlignmentOptions.Right;
 
-                // FORCE POSITION: Pivot on the Right edge (1, 0.5)
-                RectTransform labelRect = labelY.GetComponent<RectTransform>();
-                labelRect.anchorMin = Vector2.zero;
-                labelRect.anchorMax = Vector2.zero;
-                labelRect.pivot = new Vector2(1f, 0.5f); // Pivot on the Right Edge
-                labelRect.sizeDelta = new Vector2(100, 30); // Give it space to render
-
-                // Position it 15 pixels to the LEFT of the axis
-                labelRect.anchoredPosition = new Vector2(-15f, yPos);
-                labelRect.localScale = Vector3.one;
+                RectTransform rect = labelY.GetComponent<RectTransform>();
+                rect.anchorMin = Vector2.zero;
+                rect.anchorMax = Vector2.zero;
+                rect.pivot = new Vector2(1f,0.5f);
+                rect.sizeDelta = new Vector2(100,30);
+                rect.anchoredPosition = new Vector2(-15f,yPos);
             }
 
-            if (dashTemplate != null) CreateDash(new Vector2(0, yPos), new Vector2(graphWidth, yPos));
+            if(dashTemplate != null)
+                CreateDash(new Vector2(0,yPos), new Vector2(graphWidth,yPos));
         }
 
-        // 4. Draw X-Axis Labels (FIXED ALIGNMENT)
+
+        // -------------------------------
+        // X AXIS
+        // -------------------------------
+
         int xSeparatorCount = 6;
-        for (int i = 0; i <= xSeparatorCount; i++)
+
+        for(int i = 0; i <= xSeparatorCount; i++)
         {
             float normalizedValue = (float)i / xSeparatorCount;
             float xPos = normalizedValue * graphWidth;
 
-            if (labelTemplateX != null)
+            if(labelTemplateX != null)
             {
                 GameObject labelX = Instantiate(labelTemplateX, graphContainer);
                 labelX.SetActive(true);
 
-                // Set Value
                 float timeValue = normalizedValue * xMax;
-                string timeText = string.Format("{0}:{1:00}", (int)timeValue / 60, (int)timeValue % 60);
+
+                string timeText =
+                    string.Format("{0}:{1:00}",
+                    (int)timeValue / 60,
+                    (int)timeValue % 60);
 
                 TextMeshProUGUI tmp = labelX.GetComponent<TextMeshProUGUI>();
+                tmp.fontSize = 28;
                 tmp.text = timeText;
 
-                // FORCE ALIGNMENT: Center the text
-                tmp.alignment = TextAlignmentOptions.Top;
-
-                // FORCE POSITION: Pivot on the Top Edge (0.5, 1)
-                RectTransform labelRect = labelX.GetComponent<RectTransform>();
-                labelRect.anchorMin = Vector2.zero;
-                labelRect.anchorMax = Vector2.zero;
-                labelRect.pivot = new Vector2(0.5f, 1f); // Pivot on Top
-                labelRect.sizeDelta = new Vector2(100, 30);
-
-                // Position it 15 pixels BELOW the axis
-                labelRect.anchoredPosition = new Vector2(xPos, -15f);
-                labelRect.localScale = Vector3.one;
+                RectTransform rect = labelX.GetComponent<RectTransform>();
+                rect.anchorMin = Vector2.zero;
+                rect.anchorMax = Vector2.zero;
+                rect.pivot = new Vector2(0.5f,1f);
+                rect.sizeDelta = new Vector2(100,30);
+                rect.anchoredPosition = new Vector2(xPos,-15f);
             }
         }
 
-        // 5. Draw the Graph Data
+
+        // -------------------------------
+        // DRAW DATA
+        // -------------------------------
+
         GameObject lastCircle = null;
-        for (int i = 0; i < session.heartRateLogs.Count; i++)
+
+        foreach(var log in session.heartRateLogs)
         {
-            float xPos = (session.heartRateLogs[i].timeStamp / xMax) * graphWidth;
-            float yPos = ((session.heartRateLogs[i].bpm - yMin) / (yMax - yMin)) * graphHeight;
+            float xPos = (log.timeStamp / xMax) * graphWidth;
+            float yPos = ((log.bpm - yMin)/(yMax-yMin)) * graphHeight;
 
-            GameObject currentCircle = CreateDot(new Vector2(xPos, yPos));
+            GameObject circle = CreateDot(new Vector2(xPos,yPos));
 
-            if (lastCircle != null)
+            if(lastCircle != null)
             {
-                CreateConnection(lastCircle.GetComponent<RectTransform>().anchoredPosition,
-                                 currentCircle.GetComponent<RectTransform>().anchoredPosition);
+                CreateConnection(
+                    lastCircle.GetComponent<RectTransform>().anchoredPosition,
+                    circle.GetComponent<RectTransform>().anchoredPosition
+                );
             }
-            lastCircle = currentCircle;
+
+            lastCircle = circle;
         }
     }
 
-    private GameObject CreateDot(Vector2 anchoredPosition)
-    {
-        GameObject gameObject = new GameObject("dot", typeof(Image));
-        gameObject.transform.SetParent(graphContainer, false);
-        gameObject.GetComponent<Image>().sprite = circleSprite;
-        gameObject.GetComponent<Image>().color = dotColor;
 
-        RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = anchoredPosition;
-        rectTransform.sizeDelta = new Vector2(8, 8);
-        rectTransform.anchorMin = new Vector2(0, 0);
-        rectTransform.anchorMax = new Vector2(0, 0);
-        return gameObject;
+    // -------------------------------
+    // GRAPH OBJECTS
+    // -------------------------------
+
+    private GameObject CreateDot(Vector2 position)
+    {
+        GameObject obj = new GameObject("dot", typeof(Image));
+        obj.transform.SetParent(graphContainer,false);
+
+        Image img = obj.GetComponent<Image>();
+        img.sprite = circleSprite;
+        img.color = dotColor;
+
+        RectTransform rect = obj.GetComponent<RectTransform>();
+        rect.anchoredPosition = position;
+        rect.sizeDelta = new Vector2(8,8);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.zero;
+
+        return obj;
     }
 
-    private void CreateConnection(Vector2 dotA, Vector2 dotB)
+
+    private void CreateConnection(Vector2 a, Vector2 b)
     {
-        GameObject gameObject = new GameObject("dotConnection", typeof(Image));
-        gameObject.transform.SetParent(graphContainer, false);
-        gameObject.GetComponent<Image>().color = lineColor;
+        GameObject obj = new GameObject("connection", typeof(Image));
+        obj.transform.SetParent(graphContainer,false);
 
-        RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
-        Vector2 dir = (dotB - dotA).normalized;
-        float distance = Vector2.Distance(dotA, dotB);
+        obj.GetComponent<Image>().color = lineColor;
 
-        rectTransform.anchorMin = new Vector2(0, 0);
-        rectTransform.anchorMax = new Vector2(0, 0);
-        rectTransform.sizeDelta = new Vector2(distance + 2f, lineThickness);
-        rectTransform.anchoredPosition = dotA + dir * distance * 0.5f;
+        RectTransform rect = obj.GetComponent<RectTransform>();
 
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        rectTransform.localEulerAngles = new Vector3(0, 0, angle);
+        Vector2 dir = (b - a).normalized;
+        float dist = Vector2.Distance(a,b);
+
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.zero;
+        rect.sizeDelta = new Vector2(dist + 2f,lineThickness);
+        rect.anchoredPosition = a + dir * dist * .5f;
+
+        float angle = Mathf.Atan2(dir.y,dir.x) * Mathf.Rad2Deg;
+        rect.localEulerAngles = new Vector3(0,0,angle);
     }
+
 
     private void CreateDash(Vector2 start, Vector2 end)
     {
-        GameObject gameObject = Instantiate(dashTemplate, graphContainer);
-        gameObject.SetActive(true);
-        RectTransform rectTransform = gameObject.GetComponent<RectTransform>();
-        Vector2 dir = (end - start).normalized;
-        float distance = Vector2.Distance(start, end);
-        rectTransform.anchorMin = new Vector2(0, 0);
-        rectTransform.anchorMax = new Vector2(0, 0);
-        rectTransform.sizeDelta = new Vector2(distance, 1f);
-        rectTransform.anchoredPosition = start + dir * distance * 0.5f;
+        GameObject obj = Instantiate(dashTemplate,graphContainer);
+        obj.SetActive(true);
 
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        rectTransform.localEulerAngles = new Vector3(0, 0, angle);
+        RectTransform rect = obj.GetComponent<RectTransform>();
+
+        Vector2 dir = (end-start).normalized;
+        float dist = Vector2.Distance(start,end);
+
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.zero;
+        rect.sizeDelta = new Vector2(dist,1f);
+        rect.anchoredPosition = start + dir * dist * .5f;
+
+        float angle = Mathf.Atan2(dir.y,dir.x) * Mathf.Rad2Deg;
+        rect.localEulerAngles = new Vector3(0,0,angle);
     }
 }
