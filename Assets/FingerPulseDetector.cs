@@ -115,7 +115,7 @@ public class FingerPulseDetector : MonoBehaviour
             // SEND IT!
             heartRateManager.SetHeartRate(smoothBPM);
 
-            if (bpmText != null) bpmText.text = "BPM: " + Mathf.Round(smoothBPM);
+            if (bpmText != null) bpmText.text = " " + Mathf.Round(smoothBPM);
         }
     }
 }

@@ -157,7 +157,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -184,8 +184,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40
-  m_fontSizeBase: 40
+  m_fontSize: 70
+  m_fontSizeBase: 70
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -243,16 +243,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 42355783}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 887852694}
+  m_Father: {fileID: 1221676448}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 570, y: 508}
+  m_AnchoredPosition: {x: 325, y: 140}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &43650001
@@ -2240,7 +2240,6 @@ RectTransform:
   - {fileID: 186703624}
   - {fileID: 230880607}
   - {fileID: 1705146402}
-  - {fileID: 42355786}
   - {fileID: 867636244}
   - {fileID: 172094602}
   - {fileID: 1837313202}
@@ -2605,12 +2604,13 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 42355786}
   m_Father: {fileID: 887852694}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -141.44131, y: 855.68646}
+  m_AnchoredPosition: {x: -125.5, y: 859.7}
   m_SizeDelta: {x: 82.8826, y: 73.3731}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1221676449
@@ -2912,8 +2912,8 @@ MonoBehaviour:
   backgroundMusic: {fileID: 2083410699}
   useSimulatedHeartRate: 0
   currentHeartRate: 50
-  minBPM: 60
-  maxBPM: 85
+  minBPM: 70
+  maxBPM: 105
   fastestGameSpeed: 2.5
   slowestGameSpeed: 0.4
 --- !u!4 &1360482465
@@ -3290,7 +3290,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '80
+  m_text: '
 
 '
   m_isRightToLeft: 0
