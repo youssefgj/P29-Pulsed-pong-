@@ -16,8 +16,8 @@ public class HeartRateManager : MonoBehaviour
     public float currentHeartRate = 60f; // Adjusted by Camera or Slider
 
     [Header("Your Physiology (The Bornes)")]
-    public float minBPM = 50f;    // Resting (Game is Fast)
-    public float maxBPM = 90f;    // Stressed (Game is Slow)
+    public float minBPM = 70f;    // Resting (Game is Fast)
+    public float maxBPM = 105f;    // Stressed (Game is Slow)
 
     [Header("Game Speed Limits")]
     public float fastestGameSpeed = 1.5f; // When you are Chill (50 BPM)
